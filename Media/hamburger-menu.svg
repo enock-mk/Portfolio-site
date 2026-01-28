@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="hamburger-menu" transform="translate(-5.625 -6.75)">
+    <path id="Path_4" data-name="Path 4" d="M5.625,6.75h24V9h-24Z" transform="translate(0)" fill="#f6f6f6"/>
+    <path id="Path_5" data-name="Path 5" d="M5.625,16.875h24v2.25h-24Z" transform="translate(0 0.75)" fill="#f6f6f6"/>
+    <path id="Path_6" data-name="Path 6" d="M5.625,27h24v2.25h-24Z" transform="translate(0 1.5)" fill="#f6f6f6"/>
+  </g>
+</svg>
