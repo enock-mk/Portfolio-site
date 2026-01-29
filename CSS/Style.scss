@@ -70,11 +70,64 @@ img {
     max-width: 100%;
     height: auto;
     display: block;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    
+    &.loaded {
+        opacity: 1;
+    }
 }
 
 a {
     text-decoration: none;
     color: inherit;
+    transition: color 0.3s ease;
+}
+
+// ===========================
+// KEYFRAME ANIMATIONS
+// ===========================
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // ===========================
@@ -91,6 +144,11 @@ a {
     transition: all 0.3s ease;
     text-align: center;
     width: 100%;
+    position: relative;
+
+    &:active {
+        transform: scale(0.98);
+    }
 
     @include tablet {
         width: auto;
@@ -100,6 +158,11 @@ a {
         &:last-child {
             margin-right: 0;
         }
+    }
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
 
     &--primary {
@@ -118,7 +181,8 @@ a {
         font-weight: bold;
 
         &:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 10px 20px rgba(252, 60, 60, 0.3);
         }
     }
 }
@@ -134,7 +198,7 @@ a {
     font-size: 1.875rem;
     text-decoration: underline;
     text-transform: capitalize;
-    margin-bottom: $spacing-lg;
+    margin-bottom: $spacing-sm;
     text-align: center;
 
     @include tablet {
@@ -150,12 +214,16 @@ a {
 .header {
     background-color: $primary-color;
     background-image: url(../Media/emile-perron-xrVDYZRGdw4-unsplash.webp);
-    background-position: center;
+    background-position: bottom right;
     background-size: cover;
     background-attachment: fixed;
     width: 100%;
     min-height: 100vh;
     position: relative;
+
+    @include desktop{
+        background-position: center;
+    }
 
     &::before {
         content: '';
@@ -167,8 +235,7 @@ a {
         z-index: 1;
     }
 
-    .navbar,
-    .hero {
+    .navbar {
         position: relative;
         z-index: 2;
     }
@@ -177,11 +244,13 @@ a {
 .navbar {
     display: flex;
     align-items: center;
+    text-decoration: none;
     background-color: fade-out($primary-color, 0.5);
     padding: $spacing-xs $spacing-md;
     position: sticky;
     top: 0;
     z-index: 100;
+    animation: slideInUp 0.6s ease-out;
 
     @include tablet {
         padding: $spacing-xs $spacing-lg;
@@ -197,6 +266,7 @@ a {
     &__toggle {
         margin-left: auto;
         background: none;
+        
         border: none;
         cursor: pointer;
         display: flex;
@@ -207,15 +277,34 @@ a {
             display: none;
         }
 
+        @include desktop{
+            display: none;
+        }
+
         img {
             height: 24px;
             width: 24px;
-            filter: invert(1);
+            color: $text-color;
         }
 
         &[aria-expanded="true"] {
             ~ .navbar__menu {
                 display: flex;
+            }
+
+            ~ .navbar__link{
+                color: $text-color;
+                font-size: 1rem;
+                transition: color 0.3s ease;
+                text-decoration: none;
+
+                &:hover {
+                    color: $highlight-color;
+                }
+
+                &:visited{
+                    color: $text-color;
+                }
             }
         }
     }
@@ -227,28 +316,71 @@ a {
         top: 100%;
         left: 0;
         right: 0;
-        background-color: fade-out($primary-color, 0.3);
+        background-color: $primary-color;
         padding: $spacing-md;
         gap: $spacing-sm;
+        list-style: none;
+        text-decoration: none;
 
         @include tablet {
-            display: flex;
+            display: flex !important;
             flex-direction: row;
             position: static;
             background: none;
             padding: 0;
             margin-left: auto;
             gap: $spacing-md;
+            list-style: none;
+            text-decoration: none;
+        }
+
+        @include desktop{
+            display: flex !important;
+            flex-direction: row;
+            position: static;
+            background: none;
+            padding: 0;
+            margin-left: auto;
+            list-style: none;
+            text-decoration: none;
+            gap: $spacing-md;
         }
     }
 
     &__link {
-        color: white;
+        color: $text-color;
         font-size: 1rem;
-        transition: color 0.3s ease;
+        text-decoration: none;
+        position: relative;
+        transition: all 0.3s ease;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: $highlight-color;
+            transition: width 0.3s ease;
+        }
 
         &:hover {
-            color: $highlight-color;
+            transform: translateY(-2px);
+
+            &::after {
+                width: 100%;
+            }
+        }
+
+        &:visited {
+            color: $text-color;
+        }
+
+        &.active {
+            font-weight: bold;
+            border-bottom: 2px solid $highlight-color;
+            padding-bottom: 0.25rem;
         }
     }
 }
@@ -263,6 +395,7 @@ a {
     justify-content: right;
     min-height: calc(100vh - 60px);
     padding: $spacing-md;
+    animation: fadeIn 0.8s ease-out;
 
     @include tablet {
         padding: $spacing-lg;
@@ -447,9 +580,19 @@ main {
     }
 
     &__list {
-        display: grid;
+        display: flex;
+        align-items: center;
         gap: $spacing-sm;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        
+        @include desktop {
+            display: grid;
+            gap: $spacing-sm;
+        }
     }
+
+    
 
     &__description {
         p {
@@ -510,12 +653,18 @@ main {
     &.is-visible {
         opacity: 1;
         transform: translateX(0);
+        background-color: fade-out($primary-color, 0.1);
+        border-radius: 1rem;
     }
 
     p {
-        margin: 0;
+        margin: $spacing-sm;
         color: $text-color;
         font-size: 1rem;
+
+        @include desktop{
+            padding-bottom: 5px;
+        }
     }
 }
 
