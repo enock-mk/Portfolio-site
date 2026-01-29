@@ -20,7 +20,7 @@ jobs:
         # use the current pages artifact action to avoid the deprecated upload-artifact v3
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './'    # adjust to your build/output dir if not root
+          path: './dist'    # adjust to your build/output dir if not root
 
   deploy:
     needs: build
