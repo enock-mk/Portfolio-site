@@ -396,6 +396,8 @@ a {
     min-height: calc(100vh - 60px);
     padding: $spacing-md;
     animation: fadeIn 0.8s ease-out;
+    position: relative;
+    z-index: 2;
 
     @include tablet {
         padding: $spacing-lg;

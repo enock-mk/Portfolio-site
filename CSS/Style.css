@@ -299,6 +299,8 @@ a {
   min-height: calc(100vh - 60px);
   padding: 2rem;
   animation: fadeIn 0.8s ease-out;
+  position: relative;
+  z-index: 2;
 }
 @media (min-width: 768px) {
   .hero {
