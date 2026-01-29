@@ -17,7 +17,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v1
+        # use the current pages artifact action to avoid the deprecated upload-artifact v3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: './'    # adjust to your build/output dir if not root
 
