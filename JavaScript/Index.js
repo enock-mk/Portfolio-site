@@ -117,27 +117,23 @@ class ContactForm {
     }
 
     handleSubmit(e) {
-        e.preventDefault();
-
         const formData = new FormData(this.form);
         const data = Object.fromEntries(formData);
 
+        // Validate form before submission
         if (!this.validateForm(data)) {
+            e.preventDefault();
             this.showMessage('Please fill in all fields correctly', 'error');
             return;
         }
 
+        // Update button state
         const submitButton = this.form.querySelector('button[type="submit"]');
         const originalText = submitButton.textContent;
         submitButton.textContent = 'Sending...';
         submitButton.disabled = true;
 
-        setTimeout(() => {
-            this.showMessage('Message sent successfully!', 'success');
-            this.form.reset();
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-        }, 1500);
+        // Formspree will handle submission - allow default form submission
     }
 
     validateForm(data) {
