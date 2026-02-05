@@ -70,15 +70,20 @@ class AnimateOnScroll {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
         };
+        this.observer = null;
+        this.isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        this.animationCache = new WeakMap();
         this.init();
     }
 
     init() {
-        const observer = new IntersectionObserver((entries) => {
+        if (this.isReducedMotion) return; // Skip animations if user prefers reduced motion
+
+        this.observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     this.animateElement(entry.target);
-                    observer.unobserve(entry.target);
+                    this.observer.unobserve(entry.target);
                 }
             });
         }, this.options);
@@ -89,14 +94,16 @@ class AnimateOnScroll {
         animateElements.forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
-            observer.observe(el);
+            this.observer.observe(el);
         });
     }
 
     animateElement(element) {
+        if (this.animationCache.has(element)) return;
         element.style.transition = 'all 0.6s ease-out';
         element.style.opacity = '1';
         element.style.transform = 'translateY(0)';
+        this.animationCache.set(element, true);
     }
 }
 
@@ -177,13 +184,15 @@ class ProjectCarousel {
         this.carousel = document.querySelector('.projects__carousel');
         this.prevBtn = document.querySelector('.projects__button--prev');
         this.nextBtn = document.querySelector('.projects__button--next');
+        this.scrollHandler = Throttle.create(() => this._updateScrollButtons(), 100);
         this.init();
     }
 
     init() {
         if (this.carousel && this.prevBtn && this.nextBtn) {
-            this.prevBtn.addEventListener('click', () => this.scroll('prev'));
-            this.nextBtn.addEventListener('click', () => this.scroll('next'));
+            this.prevBtn.addEventListener('click', () => this.scroll('prev'), { passive: true });
+            this.nextBtn.addEventListener('click', () => this.scroll('next'), { passive: true });
+            this.carousel.addEventListener('scroll', this.scrollHandler, { passive: true });
         }
     }
 
@@ -198,6 +207,30 @@ class ProjectCarousel {
             behavior: 'smooth'
         });
     }
+
+    _updateScrollButtons() {
+        if (!this.carousel) return;
+        const { scrollLeft, scrollWidth, clientWidth } = this.carousel;
+        this.prevBtn.disabled = scrollLeft === 0;
+        this.nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth;
+    }
+}
+
+// ===========================
+// THROTTLE/DEBOUNCE UTILITIES
+// ===========================
+
+class Throttle {
+    static create(func, delay = 16) {
+        let lastCall = 0;
+        return function (...args) {
+            const now = Date.now();
+            if (now - lastCall >= delay) {
+                lastCall = now;
+                func.apply(this, args);
+            }
+        };
+    }
 }
 
 // ===========================
@@ -208,15 +241,17 @@ class ActiveNavigation {
     constructor() {
         this.navLinks = document.querySelectorAll('.navbar__link');
         this.sections = document.querySelectorAll('section[id]');
+        this.isMobile = window.innerWidth < 768;
+        this.updateActiveLink = Throttle.create(() => this._updateActiveLink(), 150);
         this.init();
     }
 
     init() {
-        window.addEventListener('scroll', () => this.updateActiveLink(), { passive: true });
-        this.updateActiveLink();
+        window.addEventListener('scroll', this.updateActiveLink, { passive: true });
+        this._updateActiveLink();
     }
 
-    updateActiveLink() {
+    _updateActiveLink() {
         let currentSection = '';
 
         this.sections.forEach(section => {
@@ -242,6 +277,7 @@ class ActiveNavigation {
 class ScrollToTop {
     constructor() {
         this.button = this.createButton();
+        this.toggleButton = Throttle.create(() => this._toggleButton(), 100);
         this.init();
     }
 
@@ -271,11 +307,11 @@ class ScrollToTop {
     }
 
     init() {
-        window.addEventListener('scroll', () => this.toggleButton(), { passive: true });
+        window.addEventListener('scroll', this.toggleButton, { passive: true });
         this.button.addEventListener('click', () => this.scrollToTop());
     }
 
-    toggleButton() {
+    _toggleButton() {
         if (window.scrollY > 300) {
             this.button.style.opacity = '1';
             this.button.style.pointerEvents = 'auto';
@@ -398,10 +434,19 @@ class SkillsAnimator {
 class CounterAnimation {
     constructor() {
         this.counters = document.querySelectorAll('[data-counter]');
+        this.isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         this.init();
     }
 
     init() {
+        if (this.isReducedMotion) {
+            // Skip animation for users with reduced motion preference
+            this.counters.forEach(counter => {
+                counter.textContent = counter.getAttribute('data-counter');
+            });
+            return;
+        }
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -416,7 +461,7 @@ class CounterAnimation {
 
     animateCounter(element) {
         const target = parseInt(element.getAttribute('data-counter'));
-        const duration = 2000;
+        const duration = 1500; // Reduced from 2000 for mobile
         const increment = target / (duration / 16);
         let current = 0;
 
@@ -462,16 +507,18 @@ class KeyboardNavigation {
 class ParallaxEffect {
     constructor() {
         this.elements = document.querySelectorAll('[data-parallax]');
-        if (this.elements.length > 0) {
+        this.isMobile = window.innerWidth < 768;
+        this.updateParallax = Throttle.create(() => this._updateParallax(), 16);
+        if (this.elements.length > 0 && !this.isMobile) {
             this.init();
         }
     }
 
     init() {
-        window.addEventListener('scroll', () => this.updateParallax(), { passive: true });
+        window.addEventListener('scroll', this.updateParallax, { passive: true });
     }
 
-    updateParallax() {
+    _updateParallax() {
         this.elements.forEach(element => {
             const speed = element.getAttribute('data-parallax') || 0.5;
             element.style.transform = `translateY(${window.scrollY * speed}px)`;
@@ -480,7 +527,7 @@ class ParallaxEffect {
 }
 
 // ===========================
-// INITIALIZE ALL MODULES
+// INITIALIZE ALL MODULES (Deferred Loading)
 // ===========================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -491,9 +538,19 @@ document.addEventListener('DOMContentLoaded', () => {
     new ProjectCarousel();
     new ActiveNavigation();
     new ScrollToTop();
-    new CounterAnimation();
     new LazyLoadImages();
     new SkillsAnimator();
     new KeyboardNavigation(mobileMenu);
-    new ParallaxEffect();
+    new ParallexEffect();
+
+    // Defer counter animations to avoid blocking main thread
+    if (window.requestIdleCallback) {
+        requestIdleCallback(() => {
+            new CounterAnimation();
+        });
+    } else {
+        setTimeout(() => {
+            new CounterAnimation();
+        }, 1000);
+    }
 });

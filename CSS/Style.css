@@ -20,6 +20,8 @@ img {
   display: block;
   transition: opacity 0.3s ease;
   opacity: 0;
+  will-change: opacity;
+  contain: paint;
 }
 img.loaded {
   opacity: 1;
@@ -69,6 +71,13 @@ a {
     transform: translateY(0);
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 .btn {
   display: inline-block;
   padding: 1rem 2rem;
@@ -80,6 +89,7 @@ a {
   text-align: center;
   width: 100%;
   position: relative;
+  will-change: transform;
 }
 .btn:active {
   transform: scale(0.98);
@@ -115,6 +125,14 @@ a {
   transform: scale(1.05) translateY(-3px);
   box-shadow: 0 10px 20px rgba(252, 60, 60, 0.3);
 }
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  .btn:hover {
+    transform: none;
+  }
+}
 
 .section-title {
   color: #083358;
@@ -142,6 +160,17 @@ a {
   width: 100%;
   min-height: 100vh;
   position: relative;
+}
+@media (min-width: 768px) {
+  .header {
+    background-attachment: fixed;
+  }
+}
+@media (max-width: 767px) {
+  .header {
+    background-attachment: scroll;
+    background-size: cover;
+  }
 }
 @media (min-width: 1024px) {
   .header {
@@ -172,6 +201,7 @@ a {
   top: 0;
   z-index: 100;
   animation: slideInUp 0.6s ease-out;
+  will-change: transform;
 }
 @media (min-width: 768px) {
   .navbar {
@@ -181,6 +211,7 @@ a {
 .navbar__logo img {
   height: 3.5rem;
   width: 3.4rem;
+  contain: layout;
 }
 .navbar__toggle {
   margin-left: auto;
@@ -233,6 +264,7 @@ a {
   gap: 1rem;
   list-style: none;
   text-decoration: none;
+  will-change: auto;
 }
 @media (min-width: 768px) {
   .navbar__menu {
@@ -290,6 +322,14 @@ a {
   font-weight: bold;
   border-bottom: 2px solid #FC3C3C;
   padding-bottom: 0.25rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar__link:hover {
+    transform: none;
+  }
+  .navbar__link::after {
+    transition: none;
+  }
 }
 
 .hero {
@@ -387,6 +427,7 @@ main {
   width: 100%;
   max-width: 300px;
   margin: 0 auto;
+  contain: layout style;
 }
 @media (min-width: 768px) {
   .about__image {
@@ -455,6 +496,7 @@ main {
           backdrop-filter: blur(3px);
   pointer-events: none;
   z-index: 0;
+  will-change: auto;
 }
 .skills > * {
   position: relative;
@@ -475,11 +517,13 @@ main {
   gap: 1rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  contain: layout;
 }
 @media (min-width: 1024px) {
   .skills__list {
     display: grid;
     gap: 1rem;
+    overflow: visible;
   }
 }
 .skills__description p {
@@ -513,6 +557,7 @@ main {
   cursor: pointer;
   position: relative;
   transition: transform 0.35s ease, opacity 0.35s ease, background-color 0.25s ease;
+  will-change: transform, background-color;
 }
 .skill-item.animate-out {
   transform: translateX(-14px) scale(0.99);
@@ -524,12 +569,25 @@ main {
   border-left-color: rgb(251.3818181818, 19.8181818182, 19.8181818182);
   transform: scale(1.02);
 }
+@media (prefers-reduced-motion: reduce) {
+  .skill-item {
+    transition: background-color 0.1ms;
+  }
+  .skill-item.animate-out {
+    transform: none;
+    opacity: 0;
+  }
+  .skill-item.skill-item--active {
+    transform: none;
+  }
+}
 
 .skills__description {
   min-height: 72px;
   transition: opacity 0.36s ease, transform 0.36s ease;
   opacity: 0;
   transform: translateX(18px);
+  will-change: opacity, transform, background-color;
 }
 .skills__description.is-visible {
   opacity: 1;
@@ -545,6 +603,11 @@ main {
 @media (min-width: 1024px) {
   .skills__description p {
     padding-bottom: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skills__description {
+    transition: opacity 0.1ms;
   }
 }
 
@@ -626,6 +689,11 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+@media (max-width: 767px) {
+  .contact {
+    background-attachment: scroll;
+  }
 }
 .contact h2 {
   color: #F6F6F6;
@@ -793,6 +861,7 @@ main {
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  will-change: transform, background-color;
 }
 .social-link:hover {
   background-color: rgba(255, 255, 255, 0.2);

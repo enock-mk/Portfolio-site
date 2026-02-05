@@ -46,6 +46,13 @@ $spacing-xl: 4rem;
     }
 }
 
+// Reduce animations for users who prefer reduced motion
+@mixin reduce-motion {
+    @media (prefers-reduced-motion: reduce) {
+        @content;
+    }
+}
+
 // ===========================
 // GLOBAL STYLES
 // ===========================
@@ -72,6 +79,8 @@ img {
     display: block;
     transition: opacity 0.3s ease;
     opacity: 0;
+    will-change: opacity;
+    contain: paint;
     
     &.loaded {
         opacity: 1;
@@ -130,6 +139,15 @@ a {
     }
 }
 
+// Disable animations for users with reduced motion preference
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 // ===========================
 // BUTTONS
 // ===========================
@@ -145,6 +163,7 @@ a {
     text-align: center;
     width: 100%;
     position: relative;
+    will-change: transform;
 
     &:active {
         transform: scale(0.98);
@@ -185,6 +204,14 @@ a {
             box-shadow: 0 10px 20px rgba(252, 60, 60, 0.3);
         }
     }
+
+    @include reduce-motion {
+        transition: none;
+        
+        &:hover {
+            transform: none;
+        }
+    }
 }
 
 // ===========================
@@ -221,6 +248,15 @@ a {
     min-height: 100vh;
     position: relative;
 
+    @include tablet {
+        background-attachment: fixed;
+    }
+
+    @media (max-width: calc($tablet - 1px)) {
+        background-attachment: scroll;
+        background-size: cover;
+    }
+
     @include desktop{
         background-position: center;
     }
@@ -251,6 +287,7 @@ a {
     top: 0;
     z-index: 100;
     animation: slideInUp 0.6s ease-out;
+    will-change: transform;
 
     @include tablet {
         padding: $spacing-xs $spacing-lg;
@@ -260,6 +297,7 @@ a {
         img {
             height: 3.5rem;
             width: 3.4rem;
+            contain: layout;
         }
     }
 
@@ -321,6 +359,7 @@ a {
         gap: $spacing-sm;
         list-style: none;
         text-decoration: none;
+        will-change: auto;
 
         @include tablet {
             display: flex !important;
@@ -381,6 +420,16 @@ a {
             font-weight: bold;
             border-bottom: 2px solid $highlight-color;
             padding-bottom: 0.25rem;
+        }
+
+        @include reduce-motion {
+            &:hover {
+                transform: none;
+            }
+
+            &::after {
+                transition: none;
+            }
         }
     }
 }
@@ -492,6 +541,7 @@ main {
         width: 100%;
         max-width: 300px;
         margin: 0 auto;
+        contain: layout style;
 
         @include tablet {
             max-width: 100%;
@@ -565,6 +615,7 @@ main {
         backdrop-filter: blur(3px);
         pointer-events: none;
         z-index: 0;
+        will-change: auto;
     }
 
     > * {
@@ -587,14 +638,14 @@ main {
         gap: $spacing-sm;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
+        contain: layout;
         
         @include desktop {
             display: grid;
             gap: $spacing-sm;
+            overflow: visible;
         }
     }
-
-    
 
     &__description {
         p {
@@ -632,6 +683,7 @@ main {
     cursor: pointer;
     position: relative;
     transition: transform 0.35s ease, opacity 0.35s ease, background-color 0.25s ease;
+    will-change: transform, background-color;
 
     &.animate-out {
         transform: translateX(-14px) scale(0.99);
@@ -644,6 +696,19 @@ main {
         border-left-color: darken($highlight-color, 8%);
         transform: scale(1.02);
     }
+
+    @include reduce-motion {
+        transition: background-color 0.1ms;
+
+        &.animate-out {
+            transform: none;
+            opacity: 0;
+        }
+
+        &.skill-item--active {
+            transform: none;
+        }
+    }
 }
 
 .skills__description {
@@ -651,6 +716,7 @@ main {
     transition: opacity 0.36s ease, transform 0.36s ease;
     opacity: 0;
     transform: translateX(18px);
+    will-change: opacity, transform, background-color;
 
     &.is-visible {
         opacity: 1;
@@ -667,6 +733,10 @@ main {
         @include desktop{
             padding-bottom: 5px;
         }
+    }
+
+    @include reduce-motion {
+        transition: opacity 0.1ms;
     }
 }
 
@@ -758,6 +828,10 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    @media (max-width: calc($tablet - 1px)) {
+        background-attachment: scroll;
+    }
 
     h2{
         color: $text-color;        
@@ -937,6 +1011,7 @@ main {
     border-radius: 50%;
     background-color: fade-out(white, 0.9);
     transition: all 0.3s ease;
+    will-change: transform, background-color;
 
     &:hover {
         background-color: fade-out(white, 0.8);
