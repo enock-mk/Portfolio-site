@@ -689,10 +689,13 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  contain: layout style;
+  will-change: auto;
 }
 @media (max-width: 767px) {
   .contact {
     background-attachment: scroll;
+    background-size: 150%;
   }
 }
 .contact h2 {
@@ -712,10 +715,21 @@ main {
   right: 0;
   bottom: 0;
   background-color: rgba(8, 51, 88, 0.72);
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
   pointer-events: none;
   z-index: 0;
+  will-change: auto;
+}
+@media (max-width: 767px) {
+  .contact::before {
+    -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+  }
+}
+@media (min-width: 768px) {
+  .contact::before {
+    -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(2px);
+  }
 }
 .contact > * {
   position: relative;
@@ -758,6 +772,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  contain: layout;
 }
 
 .form__group {
@@ -796,6 +811,7 @@ main {
 .footer {
   background-color: #0F4471;
   padding: 3rem 2rem;
+  contain: layout style;
 }
 @media (min-width: 768px) {
   .footer {
@@ -807,6 +823,7 @@ main {
   display: grid;
   gap: 3rem;
   margin-bottom: 3rem;
+  contain: layout;
 }
 @media (min-width: 768px) {
   .footer__content {
@@ -845,6 +862,7 @@ main {
   display: flex;
   gap: 2rem;
   justify-content: center;
+  contain: paint;
 }
 @media (min-width: 768px) {
   .footer__socials {
@@ -862,10 +880,23 @@ main {
   background-color: rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
   will-change: transform, background-color;
+  transform: translateZ(0);
 }
 .social-link:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-4px);
+}
+@media (max-width: 767px) {
+  .social-link {
+    transition: background-color 0.2s ease;
+  }
+  .social-link:hover {
+    transform: none;
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  .social-link:active {
+    transform: scale(0.95);
+  }
 }
 
 .social-icon {

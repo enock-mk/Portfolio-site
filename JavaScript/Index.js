@@ -164,6 +164,7 @@ class ContactForm {
             border-radius: 8px;
             z-index: 1000;
             animation: slideInRight 0.3s ease-out;
+            will-change: transform, opacity;
         `;
         messageDiv.textContent = message;
         document.body.appendChild(messageDiv);
@@ -527,6 +528,43 @@ class ParallaxEffect {
 }
 
 // ===========================
+// BACKGROUND IMAGE OPTIMIZER
+// ===========================
+
+class BackgroundImageOptimizer {
+    constructor() {
+        this.contactSection = document.querySelector('.contact');
+        this.isMobile = window.innerWidth < 768;
+        this.init();
+    }
+
+    init() {
+        if (!this.contactSection) return;
+
+        // On mobile, delay heavy background image processing
+        if (this.isMobile) {
+            if (window.requestIdleCallback) {
+                requestIdleCallback(() => this._optimizeForMobile());
+            } else {
+                setTimeout(() => this._optimizeForMobile(), 2000);
+            }
+        } else {
+            this._optimizeForDesktop();
+        }
+    }
+
+    _optimizeForMobile() {
+        // Reduce animation complexity on contact section
+        this.contactSection.style.backgroundPosition = 'center top';
+    }
+
+    _optimizeForDesktop() {
+        // Desktop gets full effect
+        this.contactSection.style.backgroundPosition = 'center';
+    }
+}
+
+// ===========================
 // INITIALIZE ALL MODULES (Deferred Loading)
 // ===========================
 
@@ -542,8 +580,9 @@ document.addEventListener('DOMContentLoaded', () => {
     new SkillsAnimator();
     new KeyboardNavigation(mobileMenu);
     new ParallexEffect();
+    new BackgroundImageOptimizer();
 
-    // Defer counter animations to avoid blocking main thread
+    // Defer counter and heavy animations to avoid blocking main thread
     if (window.requestIdleCallback) {
         requestIdleCallback(() => {
             new CounterAnimation();
